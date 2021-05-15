@@ -19,10 +19,6 @@ class SignalingChannel {
         this.socket.on("disconnect", () => {
             console.log("Disconnected");
         });
-        this.socket.on("ferret", (name, fn) => {
-            console.log(name);
-            fn("woot");
-        });
         this.socket.on("connect_error", (error) => {
             console.log("Connection error", error.message);
         });
