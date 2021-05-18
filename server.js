@@ -40,24 +40,24 @@ app.get("/connections", (req, res) => {
 io.on("connection", (socket) => {
     console.log("User connected with id", socket.id);
 
-    socket.on("ready", (peerId) => {
+    socket.on("ready", (peerId, peerType) => {
         // Make sure that the hostname is unique, if the hostname is already in connections, send an error and disconnect
         if (peerId in connections) {
             socket.emit("uniquenessError", {
-                error: `${peerId} is already connected to the signalling server. Please change your peer ID and try again.`,
+                message: `${peerId} is already connected to the signalling server. Please change your peer ID and try again.`,
             });
             socket.disconnect(true);
         } else {
             console.log(`Added ${peerId} to connections`);
             // Let new peer know about all exisiting peers
-            socket.send({ from: "all", target: peerId, action: "open", connections });
+            socket.send({ from: "all", target: peerId, action: "open", payload: connections });
             // Updates connections object
-            connections[peerId] = { socketId: socket.id, peerId };
+            connections[peerId] = { socketId: socket.id, peerId, peerType };
             // Let all other peers know about new peer
             socket.broadcast.emit("message", {
                 from: peerId,
                 target: "all",
-                message: "Peer has joined the signaling server",
+                payload: connections[peerId],
                 action: "open",
             });
         }
@@ -84,7 +84,7 @@ io.on("connection", (socket) => {
                 socket.broadcast.emit("message", {
                     from: peerId,
                     target: "all",
-                    message: "Peer has left the signaling server",
+                    payload: "Peer has left the signaling server",
                     action: "close",
                 });
                 delete connections[peerId];
