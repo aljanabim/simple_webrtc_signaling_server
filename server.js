@@ -6,8 +6,8 @@ const cors = require("cors");
 const sirv = require("sirv");
 
 // ENVIRONMENT VARIABLES
-const port = process.env.PORT || 3031;
-const dev = process.env.NODE_ENV === "development";
+const PORT = process.env.PORT || 3031;
+const DEV = process.env.NODE_ENV === "development";
 const TOKEN = process.env.TOKEN;
 
 // SETUP SERVERS
@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
         } else {
             console.log(`Added ${peerId} to connections`);
             // Let new peer know about all exisiting peers
-            socket.send({ from: "all", target: peerId, action: "open", payload: { connections } });
+            socket.send({ from: "all", target: peerId, payload: { action: "open", connections, bePolite: false } }); // The new peer doesn't need to be polite.
             // Create new peer
             const newPeer = { socketId: socket.id, peerId, peerType };
             // Updates connections object
@@ -55,8 +55,7 @@ io.on("connection", (socket) => {
             socket.broadcast.emit("message", {
                 from: peerId,
                 target: "all",
-                payload: { connections: [newPeer] }, // send connections object with an array containing the only new peer
-                action: "open",
+                payload: { action: "open", connections: [newPeer], bePolite: true }, // send connections object with an array containing the only new peer and make all exisiting peers polite.
             });
         }
     });
@@ -82,8 +81,7 @@ io.on("connection", (socket) => {
             socket.broadcast.emit("message", {
                 from: disconnectingPeer.peerId,
                 target: "all",
-                payload: "Peer has left the signaling server",
-                action: "close",
+                payload: { action: "close", message: "Peer has left the signaling server" },
             });
             // remove disconnecting peer from connections
             connections.splice(connections.indexOf(disconnectingPeer, 1));
@@ -92,7 +90,7 @@ io.on("connection", (socket) => {
 });
 
 // SERVE STATIC FILES
-app.use(sirv("public", { dev }));
+app.use(sirv("public", { DEV }));
 
 // RUN APP
-server.listen(port, console.log(`Listening on port ${port}`));
+server.listen(PORT, console.log(`Listening on PORT ${PORT}`));
