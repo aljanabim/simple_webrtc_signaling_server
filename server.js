@@ -27,9 +27,9 @@ io.use((socket, next) => {
 });
 
 // API ENDPOINT TO DISPLAY THE CONNECTION TO THE SIGNALING SERVER
-let connections = [];
+let connections = {};
 app.get("/connections", (req, res) => {
-    res.json(connections);
+    res.json(Object.values(connections));
 });
 
 // MESSAGING LOGIC
@@ -46,11 +46,11 @@ io.on("connection", (socket) => {
         } else {
             console.log(`Added ${peerId} to connections`);
             // Let new peer know about all exisiting peers
-            socket.send({ from: "all", target: peerId, payload: { action: "open", connections, bePolite: false } }); // The new peer doesn't need to be polite.
+            socket.send({ from: "all", target: peerId, payload: { action: "open", connections: Object.values(connections), bePolite: false } }); // The new peer doesn't need to be polite.
             // Create new peer
             const newPeer = { socketId: socket.id, peerId, peerType };
             // Updates connections object
-            connections.push(newPeer);
+            connections[peerId] = newPeer;
             // Let all other peers know about new peer
             socket.broadcast.emit("message", {
                 from: peerId,
@@ -66,7 +66,7 @@ io.on("connection", (socket) => {
     socket.on("messageOne", (message) => {
         // Send message to a specifi targeted peer
         const { target } = message;
-        const targetPeer = connections.find((peer) => peer.peerId === target);
+        const targetPeer = connections[peerId];
         if (targetPeer) {
             io.to(targetPeer.socketId).emit("message", { ...message });
         } else {
@@ -74,7 +74,7 @@ io.on("connection", (socket) => {
         }
     });
     socket.on("disconnect", () => {
-        const disconnectingPeer = connections.find((peer) => peer.socketId === socket.id);
+        const disconnectingPeer = Object.values(connections).find((peer) => peer.socketId === socket.id);
         if (disconnectingPeer) {
             console.log("Disconnected", socket.id, "with peerId", disconnectingPeer.peerId);
             // Make all peers close their peer channels
@@ -84,7 +84,7 @@ io.on("connection", (socket) => {
                 payload: { action: "close", message: "Peer has left the signaling server" },
             });
             // remove disconnecting peer from connections
-            connections.splice(connections.indexOf(disconnectingPeer, 1));
+            delete connections[disconnectingPeer.peerId];
         }
     });
 });
