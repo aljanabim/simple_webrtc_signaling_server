@@ -27,13 +27,9 @@ io.use((socket, next) => {
 });
 
 // API ENDPOINT TO DISPLAY THE CONNECTION TO THE SIGNALING SERVER
-let connections = {};
+let connections = [];
 app.get("/connections", (req, res) => {
-    let conList = [];
-    for (const con in connections) {
-        conList.push(connections[con]);
-    }
-    res.json(conList);
+    res.json(connections);
 });
 
 // MESSAGING LOGIC
@@ -50,14 +46,16 @@ io.on("connection", (socket) => {
         } else {
             console.log(`Added ${peerId} to connections`);
             // Let new peer know about all exisiting peers
-            socket.send({ from: "all", target: peerId, action: "open", payload: connections });
+            socket.send({ from: "all", target: peerId, action: "open", payload: { connections } });
+            // Create new peer
+            const newPeer = { socketId: socket.id, peerId, peerType };
             // Updates connections object
-            connections[peerId] = { socketId: socket.id, peerId, peerType };
+            connections.push(newPeer);
             // Let all other peers know about new peer
             socket.broadcast.emit("message", {
                 from: peerId,
                 target: "all",
-                payload: connections[peerId],
+                payload: { connections: [newPeer] }, // send connections object with an array containing the only new peer
                 action: "open",
             });
         }
@@ -69,26 +67,26 @@ io.on("connection", (socket) => {
     socket.on("messageOne", (message) => {
         // Send message to a specifi targeted peer
         const { target } = message;
-        if (target && connections[target]) {
-            io.to(connections[target].socketId).emit("message", { ...message });
+        const targetPeer = connections.find((peer) => peer.peerId === target);
+        if (targetPeer) {
+            io.to(targetPeer.socketId).emit("message", { ...message });
         } else {
             console.log(`Target ${target} not found`);
         }
     });
     socket.on("disconnect", () => {
-        for (let peerId in connections) {
-            // Find the socket id of the disconneting user
-            if (connections[peerId].socketId === socket.id) {
-                // Make all peers close their peer channels
-                console.log("Disconnected", socket.id, "with peerId", peerId);
-                socket.broadcast.emit("message", {
-                    from: peerId,
-                    target: "all",
-                    payload: "Peer has left the signaling server",
-                    action: "close",
-                });
-                delete connections[peerId];
-            }
+        const disconnectingPeer = connections.find((peer) => peer.socketId === socket.id);
+        if (disconnectingPeer) {
+            console.log("Disconnected", socket.id, "with peerId", disconnectingPeer.peerId);
+            // Make all peers close their peer channels
+            socket.broadcast.emit("message", {
+                from: disconnectingPeer.peerId,
+                target: "all",
+                payload: "Peer has left the signaling server",
+                action: "close",
+            });
+            // remove disconnecting peer from connections
+            connections.splice(connections.indexOf(disconnectingPeer, 1));
         }
     });
 });
