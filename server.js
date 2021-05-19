@@ -64,9 +64,9 @@ io.on("connection", (socket) => {
         socket.broadcast.emit("message", message);
     });
     socket.on("messageOne", (message) => {
-        // Send message to a specifi targeted peer
+        // Send message to a specific targeted peer
         const { target } = message;
-        const targetPeer = connections[peerId];
+        const targetPeer = connections[target];
         if (targetPeer) {
             io.to(targetPeer.socketId).emit("message", { ...message });
         } else {
