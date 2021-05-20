@@ -1,9 +1,9 @@
 {
-    "name": "general_webrtc_signalling_server",
+    "name": "simple_webrtc_signaling_server",
     "version": "1.0.0",
     "description": "WebRTC signalling server using Socket.io with option for rooms and deployment instructions",
     "main": "server.js",
-    "repository": "git@github.com:aljanabim/general_webrtc_signalling_server.git",
+    "repository": "git@github.com:aljanabim/simple_webrtc_signaling_server.git",
     "author": "Mustafa Al-Janabi",
     "license": "MIT",
     "scripts": {
