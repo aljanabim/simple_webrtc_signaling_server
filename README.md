@@ -50,8 +50,7 @@ The signaling server listens to the following events
     {
         from: peerId, // the client that fired the `ready` event
         target: "all", // all other clients are informed
-        message: "Peer has left the signaling server",
-        action: "close"
+        payload: { action: "close", message: "Peer has left the signaling server" },
     }
     ```
 
@@ -61,7 +60,7 @@ The signaling server listens to the following events
     {
         from: peerId, // id of sender
         target: "all", // sent to all other peers,
-        message, // the content of the message
+        payload: message, // the content of the message
     }
     ```
 
@@ -71,7 +70,7 @@ The signaling server listens to the following events
     {
         from: peerId, // id of sender
         target: targetPeerId, // id of recieving peer,
-        message, // the content of the message
+        payload: message, // the content of the message
     }
     ```
 
@@ -81,8 +80,11 @@ The signaling server listens to the following events
     {
         from: peerId, // the client that fired the `ready` event
         target: "all", // all other clients are informed
-        message: "Peer has joined the signaling server",
-        action: "open"
+        payload: {
+            action: "open",
+            connections: [newPeer],
+            bePolite: true
+        }
     }
     ```
 
@@ -92,12 +94,10 @@ The signaling server listens to the following events
     {
         from: "all", // all other conneted clients
         target: peerId, // the newely connected client
-        connections: {
-            // an object of all the existing connections in the following format
-            peerId: {
-                socketId,
-                peerId
-            }
+        payload: {
+            action: "open",
+            connections: Object.values(connections),
+            bePolite: false
         }
     }
     ```
