@@ -3,7 +3,8 @@ WebRTC is an evolving technology for peer-to-peer communication on the web. To e
 ## Installation
 
 ```bash
-git clone https://github.com/aljanabim/simple_webrtc_signaling_server.git # or git@github.com:aljanabim/simple_webrtc_signaling_server.git for SSH
+git clone https://github.com/aljanabim/simple_webrtc_signaling_server.git
+cd simple_webrtc_signaling_server
 yarn install
 ```
 
