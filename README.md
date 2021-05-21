@@ -2,6 +2,8 @@ WebRTC is an evolving technology for peer-to-peer communication on the web. To e
 
 ## Installation
 
+Make sure to have both [Node.js](https://nodejs.org/en/download/) and [Yarn](https://classic.yarnpkg.com/en/docs/install) installed.
+
 ```bash
 git clone https://github.com/aljanabim/simple_webrtc_signaling_server.git
 cd simple_webrtc_signaling_server
