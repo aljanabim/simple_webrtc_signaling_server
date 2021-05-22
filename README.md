@@ -1,3 +1,5 @@
+# Simple WebRTC Signaling Server
+
 WebRTC is an evolving technology for peer-to-peer communication on the web. To establish a succesfull WebRTC connection, the peers need to exchange ICE candidates and session description protocol (SDP). This can be done using any method of data transport. Once that connection is established, the peers no longer need to stay connected to the signalling server. Read more [here](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling). In this repository, we will use **socket.io** to implement the simplest possible signaling logic.
 
 ## Installation
