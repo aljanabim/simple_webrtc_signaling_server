@@ -10,19 +10,29 @@ cd simple_webrtc_signaling_server
 yarn install
 ```
 
-For **development** run
+## Usage
+
+The signaling server can be used in development and in production. You can use it locally to develop your WebRTC logic or deploy it on the web using your deployment service of choice (see [Deployment](##Deployment)) see Deployment. Be sure to checkout [Simple WebRTC Node.js Client](https://github.com/aljanabim/simple_webrtc_nodejs_client) for client implemenation that is compatable with the [API](##API) of this signaling server.
+
+### Development
+
+For **development** signlaing server make sure to update the environment variables, in [/config/dev.env](/config/dev.env), according to your desires. Then run:
 
 ```bash
 yarn dev
 ```
 
-and for a **production** signaling server, run
+### Production
+
+For a **production** signaling server, run
 
 ```bash
 yarn start
 ```
 
-To see an **example** of how a client might utilize the signaling server as a signaling channel, run
+## Examples
+
+For an actual implementation of a Node.js WebRTC client that utilizes the API of this signaling server, checkout [Simple WebRTC Node.js Client](https://github.com/aljanabim/simple_webrtc_nodejs_client). Otherwise, you can find starter code for a signaling channel which interacts with the signaling server in [/examples/signaling-channel.js](/examples/signaling-channel.js). To see an **example** of how a client might utilize the signaling server as a signaling channel, run
 
 ```bash
 yarn client1
@@ -34,13 +44,32 @@ and in another terminal window run
 yarn client2
 ```
 
-you will see console logs of what the siganling server and the clients are doing, according to the API (see below).
+you will see console logs of what the siganling server and the clients are doing, according to the API (see below). All the code for the examples is found in the [/examples](/examples) directory.
 
-## Usage
+## Deployment
 
-You can use this simple signaling server both in development and in production. Whether you want to deploy the server or use it for local development, please make sure to update the `.env` files inside the `config` directory.
+You can deploy this signaling server on whichever deployment service you are comfortable with, eg. Heroku, GCP, AWS, Azure, Vercel, Netlify, etc. In this section we will see an example of how to deploy the signaling server on **Heroku**. Follow these steps:
 
-For an **example** of how two peers can utilize the signaling server through a signaling channel, have a look at the code inside the `examples` folder.
+1. Do the **Prerequisites** section in [this](https://devcenter.heroku.com/articles/deploying-nodejs) article and come back once you are done.
+2. In a terminal window run
+    ```bash
+    heroku login
+    heroku create
+    git push heroku main
+    ```
+
+You will see a print-out of where your signaling server is deployed. For example,
+
+```
+$ git push heroku main
+...
+-----> Node.js app detected
+...
+-----> Launching... done
+       http://arcane-lowlands-8408.herokuapp.com deployed to Heroku
+```
+
+Save this URL and use it as **SIGNALING_SERVER_URL** in [/examples/signaling-channel.js](/examples/signaling-channel.js) or [Simple WebRTC Node.js Client](https://github.com/aljanabim/simple_webrtc_nodejs_client).
 
 ## API
 
@@ -105,9 +134,9 @@ The signaling server listens to the following events
     }
     ```
 
-## Connections API
+### Connections API
 
-The server also exposes an API Endpoint which return a JSON object containing all the connections registered in the server. It can be accessed on `[hostURL]/connections`. Ie. whichever URL is used to indicate where signaling server is hosted, concatenated with "/connections". For localhost at port 3000, this becomes `http://localhost:3000/connections`.
+The server also exposes an API Endpoint which return a JSON object containing all the connections registered in the server. It can be accessed on `[SIGNALING_SERVER_URL]/connections`. Ie. whichever URL is used to indicate where signaling server is hosted, concatenated with "/connections". For localhost at port 3000, this becomes `http://localhost:3000/connections`.
 
 ---
 
