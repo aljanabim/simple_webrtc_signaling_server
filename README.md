@@ -52,24 +52,17 @@ You can deploy this signaling server on whichever deployment service you are com
 
 1. Do the **Prerequisites** section in [this](https://devcenter.heroku.com/articles/deploying-nodejs) article and come back once you are done.
 2. In a terminal window run
+
     ```bash
     heroku login
-    heroku create
+    heroku create [name]
     git push heroku main
     ```
 
-You will see a print-out of where your signaling server is deployed. For example,
+    The name argument allows you to give your signaling server a unique name,
+    you can leave out the `[name]` argument to let Heroku generate a random name. Eg. `heroku create my-signaling-server`
 
-```
-$ git push heroku main
-...
------> Node.js app detected
-...
------> Launching... done
-       http://arcane-lowlands-8408.herokuapp.com deployed to Heroku
-```
-
-Save this URL and use it as **SIGNALING_SERVER_URL** in [/examples/signaling-channel.js](/examples/signaling-channel.js) or [Simple WebRTC Node.js Client](https://github.com/aljanabim/simple_webrtc_nodejs_client).
+3. Save the URL you get after runnning the last command (`git push`) and use it as **SIGNALING_SERVER_URL** in [/examples/signaling-channel.js](/examples/signaling-channel.js) or [Simple WebRTC Node.js Client](https://github.com/aljanabim/simple_webrtc_nodejs_client).
 
 ## API
 
