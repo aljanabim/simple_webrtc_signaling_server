@@ -17,10 +17,10 @@
         "express": "^4.17.1",
         "sirv": "^1.0.5",
         "socket.io": "^4.0.1",
-        "socket.io-client": "^4.0.1"
+        "socket.io-client": "^4.0.1",
+        "env-cmd": "^10.1.0"
     },
     "devDependencies": {
-        "env-cmd": "^10.1.0",
         "nodemon": "^2.0.4"
     },
     "keywords": [
