@@ -4,11 +4,11 @@ WebRTC is an evolving technology for peer-to-peer communication on the web. To e
 
 #### Table of Contents
 
--   [Installation](##Installation)
--   [Usage](##Usage)
--   [Examples](##Examples)
--   [Deployment](##Deployment)
--   [Api](##Api)
+-   [Installation](#Installation)
+-   [Usage](#Usage)
+-   [Examples](#Examples)
+-   [Deployment](#Deployment)
+-   [Api](#Api)
 
 ## Installation
 
