@@ -8,7 +8,7 @@ WebRTC is an evolving technology for peer-to-peer communication on the web. To e
 -   [Usage](#Usage)
 -   [Examples](#Examples)
 -   [Deployment](#Deployment)
--   [Api](#Api)
+-   [API](#Api)
 
 ## Installation
 
@@ -143,4 +143,4 @@ The server also exposes an API Endpoint which return a JSON object containing al
 
 ---
 
-Best of Luck with you WebRTC adventures. If you have any feedback, don't hestitate to reach out ☺.
+Best of Luck with your WebRTC adventures. If you have any feedback, don't hestitate to reach out ☺.
