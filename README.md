@@ -51,7 +51,7 @@ you will see console logs of what the siganling server and the clients are doing
 You can deploy this signaling server on whichever deployment service you are comfortable with, eg. Heroku, GCP, AWS, Azure, Vercel, Netlify, etc. In this section we will see an example of how to deploy the signaling server on **Heroku**. Follow these steps:
 
 1. Do the steps in the **Prerequisites** section in [this](https://devcenter.heroku.com/articles/deploying-nodejs#prerequisites) article and come back once you are done.
-2. In a terminal window run
+2. In a terminal window run each of the following lines separately (ie. don't copy-paste all the commands at once)
 
     ```bash
     heroku login
@@ -60,7 +60,7 @@ You can deploy this signaling server on whichever deployment service you are com
     heroku open
     ```
 
-    Run each line separately. The `[name]` argument allows you to give your signaling server a unique name, you can leave out the `[name]` argument to let Heroku generate a random name.
+    The `[name]` argument allows you to give your signaling server a unique name, you can leave out the `[name]` argument to let Heroku generate a random name.
 
 3. Save the URL you get in the new browser window, which opens once you run `heroku open`, and use it as the **SIGNALING_SERVER_URL** in [/examples/signaling-channel.js](/examples/signaling-channel.js) or [Simple WebRTC Node.js Client](https://github.com/aljanabim/simple_webrtc_nodejs_client).
 
