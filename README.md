@@ -2,6 +2,14 @@
 
 WebRTC is an evolving technology for peer-to-peer communication on the web. To establish a succesfull WebRTC connection, the peers need to exchange ICE candidates and session description protocol (SDP). This can be done using any method of data transport. Once that connection is established, the peers no longer need to stay connected to the signalling server. Read more [here](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling). In this repository, we will use **socket.io** to implement the simplest possible signaling logic.
 
+#### Table of Contents
+
+-   [Installation](##Installation)
+-   [Usage](##Usage)
+-   [Examples](##Examples)
+-   [Deployment](##Deployment)
+-   [Api](##Api)
+
 ## Installation
 
 Make sure to have both [Node.js](https://nodejs.org/en/download/) and [Yarn](https://classic.yarnpkg.com/en/docs/install) installed.
@@ -132,17 +140,6 @@ The signaling server listens to the following events
 ### Connections API
 
 The server also exposes an API Endpoint which return a JSON object containing all the connections registered in the server. It can be accessed on `[SIGNALING_SERVER_URL]/connections`. Ie. whichever URL is used to indicate where signaling server is hosted, concatenated with "/connections". For localhost at port 3000, this becomes `http://localhost:3000/connections`.
-
----
-
-**IMPORTANT** The versions for the SOCKET.IO server SOCKET.IO-CLIENT have to match in `package.json` in order for everything to match. For example, at the time of writing, they are set to:
-
-```json
-{
-    "socket.io": "^4.0.1",
-    "socket.io-client": "^4.0.1"
-}
-```
 
 ---
 
