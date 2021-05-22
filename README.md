@@ -50,7 +50,7 @@ you will see console logs of what the siganling server and the clients are doing
 
 You can deploy this signaling server on whichever deployment service you are comfortable with, eg. Heroku, GCP, AWS, Azure, Vercel, Netlify, etc. In this section we will see an example of how to deploy the signaling server on **Heroku**. Follow these steps:
 
-1. Do the **Prerequisites** section in [this](https://devcenter.heroku.com/articles/deploying-nodejs) article and come back once you are done.
+1. Do the steps in the **Prerequisites** section in [this](https://devcenter.heroku.com/articles/deploying-nodejs#prerequisites) article and come back once you are done.
 2. In a terminal window run
 
     ```bash
