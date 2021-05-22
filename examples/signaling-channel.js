@@ -1,9 +1,9 @@
 const io = require("socket.io-client");
 // This is a bare minimum example of how one might setup a signaling channel as a class
 class SignalingChannel {
-    constructor(peerId, hostURL, token) {
+    constructor(peerId, signalingServerUrl, token) {
         this.peerId = peerId;
-        this.socket = new io(hostURL, {
+        this.socket = new io(signalingServerUrl, {
             auth: { token },
             autoConnect: false, // disables auto connection, by default the client would connect to the server as soon as the io() object is instatiated
             reconnection: false, // disables auto reconnection, this can occur when for example the host server disconnects. When set to true, the client would keep trying to reconnect
