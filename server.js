@@ -85,6 +85,8 @@ io.on("connection", (socket) => {
             });
             // remove disconnecting peer from connections
             delete connections[disconnectingPeer.peerId];
+        } else {
+            console.log(socket.id, "has disconnected");
         }
     });
 });
