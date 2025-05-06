@@ -36,7 +36,7 @@ app.get("/connections", (req, res) => {
 io.on("connection", (socket) => {
     console.log("User connected with id", socket.id);
 
-    socket.on("ready", (peerId, peerType) => {
+    socket.on("ready", (peerId, peerType, publicKey) => {
         // Make sure that the hostname is unique, if the hostname is already in connections, send an error and disconnect
         if (peerId in connections) {
             socket.emit("uniquenessError", {
@@ -48,14 +48,14 @@ io.on("connection", (socket) => {
             // Let new peer know about all exisiting peers
             socket.send({ from: "all", target: peerId, payload: { action: "open", connections: Object.values(connections), bePolite: false } }); // The new peer doesn't need to be polite.
             // Create new peer
-            const newPeer = { socketId: socket.id, peerId, peerType };
+            const newPeer = { socketId: socket.id, peerId, peerType, publicKey };
             // Updates connections object
             connections[peerId] = newPeer;
             // Let all other peers know about new peer
             socket.broadcast.emit("message", {
                 from: peerId,
                 target: "all",
-                payload: { action: "open", connections: [newPeer], bePolite: true }, // send connections object with an array containing the only new peer and make all exisiting peers polite.
+                payload: { action: "open", connections: connections, bePolite: true }, // send connections object with an array containing the only new peer and make all exisiting peers polite.
             });
         }
     });
