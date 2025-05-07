@@ -4,6 +4,7 @@ const express = require("express");
 const socketio = require("socket.io");
 const cors = require("cors");
 const sirv = require("sirv");
+const rateLimit = require("express-rate-limit");
 
 // ENVIRONMENT VARIABLES
 const PORT = process.env.PORT || 3030;
@@ -15,10 +16,22 @@ const app = express();
 app.use(express.json(), cors());
 const server = http.createServer(app);
 const io = socketio(server, { cors: {} });
+const MAX_CONNECTIONS = 20;
 
 // AUTHENTICATION MIDDLEWARE
 io.use((socket, next) => {
-    const token = socket.handshake.auth.token; // check the auth token provided by the client upon connection
+    const ip = socket.handshake.address;
+    const token = socket.handshake.auth.token;
+
+    // // Check rate limit
+    if (!checkRateLimit(ip)) {
+        console.log("Too many connection attempts from this IP, please try again later.")
+        next(new Error("Too many connection attempts from this IP, please try again later."));
+        return;
+    }
+
+    // next();
+    // Check token
     if (token === TOKEN) {
         next();
     } else {
@@ -32,11 +45,80 @@ app.get("/connections", (req, res) => {
     res.json(Object.values(connections));
 });
 
+// HTTP RATE LIMITER
+const httpRateLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: "Too many requests from this IP, please try again later.",
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+app.use(httpRateLimiter);
+
+// WEBSOCKET RATE LIMITER
+const connectionAttempts = new Map();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_ATTEMPTS = 500; // Max 5 connection attempts per IP
+
+function checkRateLimit(ip) {
+    const now = Date.now();
+    const attempts = connectionAttempts.get(ip) || { count: 0, firstAttempt: now };
+
+    // Reset count if window has expired
+    if (now - attempts.firstAttempt > RATE_LIMIT_WINDOW) {
+        attempts.count = 0;
+        attempts.firstAttempt = now;
+    }
+
+    attempts.count += 1;
+
+    // Update the map
+    connectionAttempts.set(ip, attempts);
+
+    // Check if limit is exceeded
+    if (attempts.count > MAX_ATTEMPTS) {
+        return false;
+    }
+
+    // Clean up old entries
+    for (const [key, value] of connectionAttempts) {
+        if (now - value.firstAttempt > RATE_LIMIT_WINDOW) {
+            connectionAttempts.delete(key);
+        }
+    }
+
+    return true;
+}
+
 // MESSAGING LOGIC
 io.on("connection", (socket) => {
     console.log("User connected with id", socket.id);
 
-    socket.on("ready", (peerId, peerType, publicKey) => {
+    // Check connection limit before proceeding
+    const currentConnections = Object.keys(connections).length;
+    if (currentConnections >= MAX_CONNECTIONS) {
+        // Find the oldest peer
+        const oldestPeer = Object.values(connections).reduce((oldest, peer) => 
+            (!oldest || peer.connectionTime < oldest.connectionTime) ? peer : oldest
+        );
+        
+        // Disconnect the oldest peer
+        const oldestSocket = io.sockets.sockets.get(oldestPeer.socketId);
+        if (oldestSocket) {
+            oldestSocket.emit("message", {
+                from: "server",
+                target: oldestPeer.peerId,
+                payload: { action: "close", message: "Disconnected due to connection limit" }
+            });
+            oldestSocket.disconnect(true);
+            delete connections[oldestPeer.peerId];
+            console.log(`Dropped oldest peer ${oldestPeer.peerId} to make room for new connection`);
+        }
+    }
+
+    socket.on("ready", (readyMessage) => {
+        const { peerDto, type } = readyMessage;
+        const { peerId, publicKey, x, y, sex, searching, age } = peerDto;
         // Make sure that the hostname is unique, if the hostname is already in connections, send an error and disconnect
         if (peerId in connections) {
             socket.emit("uniquenessError", {
@@ -48,7 +130,7 @@ io.on("connection", (socket) => {
             // Let new peer know about all exisiting peers
             socket.send({ from: "all", target: peerId, payload: { action: "open", connections: Object.values(connections), bePolite: false } }); // The new peer doesn't need to be polite.
             // Create new peer
-            const newPeer = { socketId: socket.id, peerId, peerType, publicKey };
+            const newPeer = { socketId: socket.id, peerId, type, publicKey, age, x, y, sex, searching };
             // Updates connections object
             connections[peerId] = newPeer;
             // Let all other peers know about new peer
